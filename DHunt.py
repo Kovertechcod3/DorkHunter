@@ -4,9 +4,9 @@ import argparse
 import sys
 
 
-def search_emails(username, domain, dork):
+def search_usernames(email, domain, dork):
     # Define the search query using the selected Google Dork
-    search_query = f'site:{domain} {dork} "{username}"'
+    search_query = f'site:{domain} {dork} "{email}"'
 
     # Send a request and retrieve the search results
     url = f'https://www.google.com/search?q={search_query}'
@@ -18,29 +18,29 @@ def search_emails(username, domain, dork):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Process the search results
-    email_results = []
+    username_results = []
     search_results = soup.select('.r')  # Adjust the selector based on the structure of Google search results
 
     for result in search_results:
         link_element = result.select_one('a')
         if link_element:
             link = link_element['href']
-            email = extract_email_from_link(link)
-            if email:
-                email_results.append(email)
+            username = extract_username_from_link(link)
+            if username:
+                username_results.append(username)
 
-    return email_results
+    return username_results
 
 
-def extract_email_from_link(link):
-    # Extract the email from the link URL
+def extract_username_from_link(link):
+    # Extract the username from the link URL
     start_index = link.find('://') + 3
     end_index = link.find('/', start_index)
     if end_index == -1:
         end_index = len(link)
-    email = link[start_index:end_index]
-    if '@' in email:
-        return email
+    username = link[start_index:end_index]
+    if '@' not in username:
+        return username
     return None
 
 
@@ -52,21 +52,21 @@ def print_dorks():
     print("3. inurl: - Searches for the username within the URL of the page.")
 
 
-def main(username, domain, dork):
-    # Search for emails
-    emails = search_emails(username, domain, dork)
+def main(email, domain, dork):
+    # Search for usernames
+    usernames = search_usernames(email, domain, dork)
 
-    if emails:
-        print(f"Emails associated with '{username}' on '{domain}':")
-        for email in emails:
-            print(email)
+    if usernames:
+        print(f"Usernames associated with '{email}' on '{domain}':")
+        for username in usernames:
+            print(username)
     else:
-        print(f"No emails found associated with '{username}' on '{domain}'.")
+        print(f"No usernames found associated with '{email}' on '{domain}'.")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Search for emails using Google Dorks.")
-    parser.add_argument("username", type=str, help="Username to search for")
+    parser = argparse.ArgumentParser(description="Search for usernames using Google Dorks.")
+    parser.add_argument("email", type=str, help="Email address to search for")
     parser.add_argument("domain", type=str, help="Domain to search within")
     parser.add_argument(
         "dork_choice",
@@ -83,4 +83,4 @@ if __name__ == "__main__":
     }
     dork = dork_mapping[args.dork_choice]
 
-    main(args.username, args.domain, dork)
+    main(args.email, args.domain, dork)
