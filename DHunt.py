@@ -26,72 +26,15 @@ load_dotenv()
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Define configuration templates for different scraping tasks
-CONFIG_TEMPLATES = {
-    "image": {
-        "API_URL": "https://api.example.com/image-data",
-        "PROXY_LIST": [
-            "http://your_proxy1:port",
-            "http://your_proxy2:port",
-            "http://your_proxy3:port"
-        ],
-        "HEADERS": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        },
-        "XPATH": "//img/@src",
-        "CSS_SELECTOR": "img",
-        "DB_NAME": "image_data.db"
-    },
-    "video": {
-        "API_URL": "https://api.example.com/video-data",
-        "PROXY_LIST": [
-            "http://your_proxy1:port",
-            "http://your_proxy2:port",
-            "http://your_proxy3:port"
-        ],
-        "HEADERS": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        },
-        "XPATH": "//video/source/@src",
-        "CSS_SELECTOR": "video source",
-        "DB_NAME": "video_data.db"
-    },
-    "sensitive": {
-        "API_URL": "https://api.example.com/sensitive-data",
-        "PROXY_LIST": [
-            "http://your_proxy1:port",
-            "http://your_proxy2:port",
-            "http://your_proxy3:port"
-        ],
-        "HEADERS": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        },
-        "XPATH": "//div[@class='sensitive-info']/text()",
-        "CSS_SELECTOR": ".sensitive-info",
-        "DB_NAME": "sensitive_data.db"
-    },
-    "audio": {
-        "API_URL": "https://api.example.com/audio-data",
-        "PROXY_LIST": [
-            "http://your_proxy1:port",
-            "http://your_proxy2:port",
-            "http://your_proxy3:port"
-        ],
-        "HEADERS": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        },
-        "XPATH": "//audio/source/@src",
-        "CSS_SELECTOR": "audio source",
-        "DB_NAME": "audio_data.db"
-    }
-}
-
-def load_config(scraping_type, url):
-    """Load configuration based on the scraping type and URL."""
-    if scraping_type not in CONFIG_TEMPLATES:
+# Load configuration from the master JSON file
+def load_config(scraping_type, url, config_file='master_config.json'):
+    with open(config_file, 'r') as file:
+        config_data = json.load(file)
+    
+    if scraping_type not in config_data:
         raise ValueError("Invalid scraping type.")
     
-    config = CONFIG_TEMPLATES[scraping_type].copy()
+    config = config_data[scraping_type].copy()
     config['SCRAPING_URL'] = url
     return config
 
